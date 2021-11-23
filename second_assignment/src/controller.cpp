@@ -28,6 +28,40 @@ float mini ( float arr[720], int ind=0, int size=720){
 }
 
 
+//bool char_input (second_assignment::Accelerate::Request &req, second_assignment::Accelerate::Response &res)
+//{ 
+//	std_srvs::Empty reset_srv;
+//	if (req.input=='a'){
+//	
+//		std::cout<<"got a\n";
+//		acc =acc+0.5;
+//		
+//		
+//	}
+//	if (req.input == 's'){
+//	
+//		std::cout<<"got s\n";
+//		acc =acc-0.5;
+//		
+//	}
+//	if (req.input == 'r'){
+//		std::cout<<"got r\n";
+//		
+//		ros::service::call("/reset_positions", reset_srv);
+//		
+//	}
+//	
+//	if (req.input != 's' && req.input != 'r' && req.input != 'a' ){
+//		std::cout<<"wrong char\n";
+//		
+//	}
+//	
+//	res.val = acc;
+//	std::cout<<res.val<<"\n";
+//	return true; 
+//}
+
+
 void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg/*, const second_assignment::Acc::ConstPtr& msg1*/)
 {
 
@@ -100,8 +134,8 @@ int main (int argc, char **argv)
 	// Initialize the node, setup the NodeHandle for handling the communication with the ROS //system
 	ros::init(argc, argv, "robot_controller"); 
 	ros::NodeHandle nh;
-
-
+	
+	//ros::ServiceServer service = nh.advertiseService("/accelerate",char_input); 
 	ros::Subscriber sub = nh.subscribe("/base_scan", 1000,robotCallback); 
 	ros::Subscriber sub1 = nh.subscribe("/acc", 1000,accelerator);
 	
