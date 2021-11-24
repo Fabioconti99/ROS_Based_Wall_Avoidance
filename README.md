@@ -1,5 +1,5 @@
  #  [Research_Track_1](https://unige.it/en/off.f/2021/ins/51201.html?codcla=10635) , [Robotics Engineering](https://courses.unige.it/10635) ([UNIGE](https://unige.it/it/)) : Second assignement
-## Robot Operating System <img height="30" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/ros.png">
+## Robot Operating System <img height="30" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/ros.png"> & C++ <img height="30" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/cpl.png">
 ### Professor. [Carmine Recchiuto](https://github.com/CarmineD8)
 
 
@@ -21,7 +21,7 @@ The user will be able to interact with the simulation through the use of **KeyBo
 
 Picture of the **Enviroment**:
 
-![alt text](https://github.com/Fabioconti99/RT1_Assignment_1/blob/main/images/arena.png) 
+![alt text](https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/map.png) 
 
 With everything working correctly, the robot should lap around the circuit avoiding the walls at different velocities on an infinite loop. If the velocity would get too high, it may lead to the robot crashing into the wall but that would be perfectly reasonable. 
 
@@ -218,11 +218,17 @@ void accelerator(const second_assignment::Acc::ConstPtr& msg1)
     std::cout<<msg1->a<<"\n";
 }
 ```
-
 * Usage:
 ```bash
 rosrun second_assignment robot_controller_node
 ```
+* The following *FlowChart* shows grafically the implemented logic:
+
+<p align="center">
+
+<src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/flow2.png">
+
+</p>
 
 ------
 ## Server Node: input_node
@@ -285,7 +291,7 @@ The `std::cin>>` will associate the `char` input to a `char` variable that will 
 
 * The following code shows  the robotCallBack:
 
-```
+```cpp
 
 void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
@@ -316,3 +322,13 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 ```bash
 rosrun second_assignment UI_node
 ```
+
+
+Project Flow-Chart
+--------------------
+
+<p align="center">
+
+<src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/flow.png">
+
+</p>
