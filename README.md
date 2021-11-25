@@ -152,7 +152,7 @@ float mini ( float arr[720], int ind=0, int size=720){
 The `robotCallBack` function implements a cycle that will determine what velocity to publish on the `cmd_vel`  topic.
 
 As a "default state", the robot will move around the circuit at a costant velocity of 1.0 towards its relative X-Axis resulting in a motion. 
-Once the middle detecting area will register a distance shorter than 1.5 units, the robot will stop driving forward and it will start checking on the other areas. These detecting zones are located at the sides of the robot. Thanks to an if-statemnt, the code will check if the shortest distance is detected on the right side or on the left side of the robot. Depending on this decision, the robot will decide to either turn left or right to get away of the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity of 1.0 and a linear velocity of 0.1. To be sure to keep a distance from the walls, once the side detecting areas detect one, the code will set a linear velocity along the Y-Axis towads the opposite directions of the closest bareer. 
+Once the middle detecting area will register a distance shorter than 1.5 units, the robot will stop driving forward and it will start checking on the other areas. These detecting zones are located at the sides of the robot. Thanks to an if-statemnt, the code will check if the shortest distance is detected on the right side or on the left side of the robot. Depending on this decision, the robot will decide to either turn left or right to get away of the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity of 1.0 and a linear velocity of 0.2. To be sure to keep a distance from the walls, once the side detecting areas detect one, the code will set a linear velocity along the Y-Axis towads the opposite directions of the closest bareer. 
 At the end of the cycle, the velocity will be published in the `cmd_vel` and it will be read by the symulation which will move the robot correctly.
 
 `robotCallBack`:
@@ -363,3 +363,22 @@ The **Input Node** works a a *service* for the requests sent by the *UI Node* fo
 
 For any other input the node will just return an error message.
 
+### Video of the robot's performance
+
+The following video shows the performance of the robot during the first few laps around the circuit. The performance shows how the different input commands affect the robot's movements. 
+
+
+
+Possible improvements
+-----------------
+During the development of the code I came up with some few ideas that could lead to a deep improvement of the driving capabilities of the robot. I also implemented a simpler version of the package based on a smaller number of Ros nodes utilized. 
+
+* With the implementation I came up so far, once the robot gets close to a maze's wall it will stop the forward motion and will start checking the sides to see where the closest wall is. Thanks to an if-statement, the robot will know whether the closest wall is to its right o to its left and it will accordingly assign an angular rotation to turn away of thr wall. Since the motor sensors return an highly updated data set about the robot's surroundings, the idea I had was to implement a code capable of makeing the robot always keep to its front the detection area with the longest distance detected. This approach to the development of the robot's movement would theoretically keep the robot's orientation always towards the most free direction. However, the coding of this logic didn't lead to a feasible solution. The main issue related to the use of this logic comes form the scanning capabilities of the laser scanners. During the approach tight turns, the lasers will indentify the longest distance towards a direction slightly covered by a wall. This will cause the robot to follow the scanner direction and eventually hit the wall. Fixing this issue could lead to a nicer logic that could handle higer robots' velocities. 
+
+* Another implementation I succesfully built relies on a less modular structure of the nodes comunicatin scheme. Instead of implementing a separate Ros node for the implementation of the *service*, I coded it inside the controller node. This verision of the project simplifies the comunication net between all the nodes (the user should only launch 3 nodes instead of 4). Though, the modularity of this version of the project would be slightly penalized cause of the removal of one Ros Node. According to the objective of mantaining an higer modularity for the project I decided to keep the 4-nodes version as the final one.
+
+
+Conclusions
+-----------------
+To take care of all the project's requests, I choose to manage the code's structure with modular logic. Thanks to this approach, I was able to get to the end of the assignment with a schematic structure of the project concerning 4 Ros nodes overall.  Thanks to the well-chosen parameters given to the controlling node, the robot can autonumusly drive around the circuit for many laps at differet velocities. The whole implementation makes the robot capable of lapping flawlessly at an highest velocity pick of 11-12 units. 
+This project was my first approach to the ROS1 workflow. Working on this assignment, I gained knowledge about the basic concepts of ROS such as managing *callBack* functions, implementing new *services* and *messages* and building a modular and clearly organized *pakage* structure. 
