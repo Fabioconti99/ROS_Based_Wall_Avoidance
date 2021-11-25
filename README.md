@@ -7,6 +7,7 @@
 Project objectives
 --------------------
 The aim of this project was to create a ROS Pakage capable of make a cubical robot equiped with laser scanners, lap around a given circuit. The package contains the C++ surces needed for the interaction with the robot. The given enviroment is a simple 3D model of the actual Monza's F1 circuit.
+ROS (Robot Operating System) is a set of tools and libraries for autonomous, robust, efficient, and secure mobile robot navigation, which uses sensors to sense the environment and computer vision techniques as the navigation method.
 
 The behavior of the robot has to stand by the following rules:
 * Constantly driving around the environment in the clockwise direction,
@@ -195,14 +196,13 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
              my_vel.linear.y= 1.5;
          }
          else {
-         my_vel.linear.y= 0.0;
+             if (mini(laser, 620,50)<0.2){
+                 my_vel.linear.y= -1.5;
+             }
+             else {
+             my_vel.linear.y= 0.0;
+             }
          }
-         
-         if (mini(laser, 620,50)<0.2){
-             my_vel.linear.y= -1.5;
-         }
-         else {
-         my_vel.linear.y= 0.0;
          
         pub.publish(my_vel);
 }
@@ -324,7 +324,7 @@ rosrun second_assignment UI_node
 ```
 
 
-Project Flow-Chart
+Project Flowchart
 --------------------
 
 <p align="center">
@@ -332,3 +332,34 @@ Project Flow-Chart
 <img height="500" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/flow.png">
 
 </p>
+
+
+Summary of the Flowchart and 
+reasoning behind the structure of the project
+--------------------
+The flowchart is composed by:
+
+* **Green** and **yallow** boxs that rappresents the *Ros nodes* required to run the simulation,
+* **Red** ovals rappresenting the *topics* needed by the nodes to exchange data and
+* **Light blue** ovals to show all the requests and responses of *services*. 
+
+The whole system is controlled by the **Controller Node**. This program deals with the navigation takeing care of the following tasks:
+
+* It recives a costant flow of information about the  robot's surroundings thanks to the subscription to the */Base_scan* topic.
+* This Data is managed by the *robotCallBack* to publish the proper robot's velocity parameters on the */Cmd_vel* topic. 
+* Thanks to the */Acc* topic's subscription, the node will also take care of the change of the robot's speed choose by the user in the *UI node*.
+
+The **UI Node** has the role of takeing KeyBoard inputs from the user and sending their responses to the system. The program comunicates the the other nodes as it follows: 
+
+* It recives inforation from the user's input with a  `std::cin>>`.
+* The Input will be sent as a riquest to the *Server Node* that will turn the given input into a resposne regarding the increase/decrease speed factor.
+* This value will be sent to the controller node that will add it to the current linear velocity.
+
+The **Input Node** works a a *service* for the requests sent by the *UI Node* for managing the robot's speed and the RESET condition of the system. Depending on what kind of input the node will recive, the service could either:
+
+* INCREMENT the robot's speed if the given input is the `a` char or, 
+* DECREMENT the robot's speed if the given input is the `s` char or, 
+* RESET the robot's position through the use of the */reset_position* if the given input is the `r` char.
+
+For any other input the node will just return an error message.
+
