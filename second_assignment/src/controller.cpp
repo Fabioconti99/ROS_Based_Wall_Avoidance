@@ -100,17 +100,17 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg/*, const second_a
 		}
 		 
 		 
-		 if (mini(laser, 0,50)<0.2){
-		 	my_vel.linear.y= 1.5;
-		 }
-		 else {
-             if (mini(laser, 620,50)<0.2){
-                 my_vel.linear.y= -1.5;
-             }
-             else {
-             my_vel.linear.y= 0.0;
-             }
-		 }
+//		 if (mini(laser, 0,50)<0.2){
+//		 	my_vel.linear.y= 1.5;
+//		 }
+//		 else {
+//             if (mini(laser, 620,50)<0.2){
+//                 my_vel.linear.y= -1.5;
+//             }
+//             else {
+//             my_vel.linear.y= 0.0;
+//             }
+//		 }
 		 
 		 
 		 
