@@ -3,7 +3,6 @@
 #include "std_srvs/Empty.h"
 
 float acc=0;
-//ros::ServiceClient client2;
 
 bool char_input (second_assignment::Accelerate::Request &req, second_assignment::Accelerate::Response &res)
 { 
@@ -44,9 +43,7 @@ int main(int argc, char **argv) {
 
 	ros::init(argc, argv, "input");
 	ros::NodeHandle n;
-	ros::ServiceServer service = n.advertiseService("/accelerate",char_input); 
-	//client2 = n.serviceClient<std_srvs::Empty>("/reset_positions");
-	
+	ros::ServiceServer service = n.advertiseService("/accelerate",char_input);
 	ros::spin();
 	return 0; 
 }

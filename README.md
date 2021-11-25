@@ -329,6 +329,6 @@ Project Flow-Chart
 
 <p align="center">
 
-<img height="1000" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/flow.png">
+<img height="500" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/flow.png">
 
 </p>
