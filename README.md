@@ -115,6 +115,8 @@ On the  `cmd_vel` Topic, the Simulation Node pubblishes all the information acqu
 The following picture gives a visual rappresentation of the lasers inside the enviroment:
 
 <p align="center">
+ 
+<img width="456" alt="laser_scanner" src="https://user-images.githubusercontent.com/91262561/143497570-fc64e014-f41a-4a99-990c-1cc71a7cfe95.png">
 
 </p>
 
@@ -153,7 +155,17 @@ The `robotCallBack` function implements a cycle that will determine what velocit
 
 As a "default state", the robot will move around the circuit at a costant velocity of 1.0 towards its relative X-Axis resulting in a motion. 
 Once the middle detecting area will register a distance shorter than 1.5 units, the robot will stop driving forward and it will start checking on the other areas. These detecting zones are located at the sides of the robot. Thanks to an if-statemnt, the code will check if the shortest distance is detected on the right side or on the left side of the robot. Depending on this decision, the robot will decide to either turn left or right to get away of the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity of 1.0 and a linear velocity of 0.2. To be sure to keep a distance from the walls, once the side detecting areas detect one, the code will set a linear velocity along the Y-Axis towads the opposite directions of the closest bareer. 
-At the end of the cycle, the velocity will be published in the `cmd_vel` and it will be read by the symulation which will move the robot correctly.
+The following *gif* shows the robot approaching a tight turn:
+
+<p align="center">
+ 
+ 
+ ![ezgif-6-ba821d419f16](https://user-images.githubusercontent.com/91262561/143498173-8fb3dbb9-4301-41e3-94b0-900876ed5640.gif)
+
+
+</p>
+
+At the end of the cycle, the velocity will be published in the `cmd_vel` and it will be read by the symulation node which will make the robot move the robot correctly.
 
 `robotCallBack`:
 
