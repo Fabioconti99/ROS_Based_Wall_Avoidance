@@ -6,35 +6,36 @@
 --------------------
 Project objectives
 --------------------
-The aim of this project was to create a ROS Pakage capable of make a cubical robot equiped with laser scanners, lap around a given circuit. The package contains the C++ surces needed for the interaction with the robot. The given enviroment is a simple 3D model of the actual Monza's F1 circuit.
+This project aimed to create a ROS Package capable of making a cubical robot equipped with laser scanners, a lap around a given circuit. The package contains the C++ sources needed for the interaction with the robot. The environment is a simple 3D model of the actual Monza's F1 circuit.
 ROS (Robot Operating System) is a set of tools and libraries for autonomous, robust, efficient, and secure mobile robot navigation, which uses sensors to sense the environment and computer vision techniques as the navigation method.
 
 The behavior of the robot has to stand by the following rules:
 * Constantly driving around the environment in the clockwise direction,
 * Avoiding to hit the walls, 
 * Being able to either **accelerate** or **decelerate** if the user will ask to do so,
-* And **Resetting** it's own position to the starting one if asked to. 
+* And **Resetting** its position to the starting one if asked to. 
 
 The user will be able to interact with the simulation through the use of **KeyBoard inputs**:
 * Pressing the `r` key will RESET the initial position of the robot.
-* Pressing the `s` key will SLOW DOWN the speed of the robot by **half unit** at every tap of the button.
-* Pressing the `a` key will INCREASE the speed of the robot by **half unit** at every tap of the button.
+* Pressing the `s` key will SLOW DOWN the robot's speed by **half unit** at every tap of the button.
+* Pressing the `a` key will INCREASE the robot's speed by **half unit** at every tap of the button.
 
 Picture of the **Enviroment**:
 
 ![alt text](https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/map.png) 
 
-With everything working correctly, the robot should lap around the circuit avoiding the walls at different velocities on an infinite loop. If the velocity would get too high, it may lead to the robot crashing into the wall but that would be perfectly reasonable. 
+With everything working correctly, the robot should lap around the circuit avoiding the walls at different velocities on an infinite loop. If the velocity
+gets too high, it may lead to the robot crashing into the wall but that would be perfectly reasonable. 
 
 --------
 
 Installing and running
 ----------------------
 
-The simulation requires a ROS Noetic installation, and the clone of the [Teacher's repository](https://github.com/CarmineD8/second_assignment). The repo contains the workspace for running the simulation node. The source includes The *CmakeList* for compiling the node and the *World* file for building the scene.
+The simulation requires a ROS Noetic installation, and the clone of the [Teacher's repository](https://github.com/CarmineD8/second_assignment). The repo contains the workspace for running the simulation node. The source includes the *CmakeList* for compiling the node and the *World* file for building the scene.
 The package I developed contains:
 
-* A *Controller node* which will comand the movemnts and the accelleration of the robot.
+* A *Controller node* which will command the movements and the acceleration of the robot.
 * A *UI node* to let the user interact with the simulation with the KeyBoard Inputs. 
 * A *Server node* that will process the KeyBoard Input and modify the acceleration factor accordingly to the pressed key. 
 * ONE *custom service* needed by the server node to exchange data between the *request* and the *response*.
@@ -43,7 +44,7 @@ The package I developed contains:
 
 ## Running the simulation
 
-Please follow these steps to run the Circuit scene:
+* Please follow these steps to run the Circuit scene:
 
 1. Open a terminal and run the master, using the command:
 ```bash
@@ -66,13 +67,31 @@ rosrun second_assignment UI_node
 rosrun second_assignment robot_controller_node
 ```
 
+* You could also run the program with the launch command:
+```bash
+
+roslaunch second_assignment run.launch
+```
+
+the launch script lets the user start the whole project with just one command. The following code shows all the instructions sent by the launch program.
+```bash
+
+<launch>
+  <node name="carcontroller_node" pkg="second_assignment" type="carcontroller_node" required="true"/>
+  
+  <node name="UI_node" pkg="second_assignment" type="UI_node" output="screen" launch-prefix="xterm -fg white -bg black -e "  required="true"/>
+  
+  <node name="stageros" pkg="stage_ros" type="stageros" required ="true" args = "$(find second_assignment)/world/my_world.world"/>
+</launch>
+```
+
 ------
 NODES Description
 -------------------
 
 ## Simulation Node: StageRos
 
-The node used for the simulation is the standard node `StageRos`. The stageros node wraps the Stage 2-D multi-robot simulator, via libstage. Stage simulates a world as defined in a .world file. This file tells stage everything about the world, from obstacles (usually represented via a bitmap to be used as a kind of background), to robots and other objects.
+The node used for the simulation is the standard node `StageRos`. The stageros node wraps the Stage 2D multi-robot simulator, via libstage. Stage simulates a world as defined in a .world file. This file tells stage everything about the world, from obstacles (usually represented via a bitmap to be used as a kind of background), to robots and other objects.
 
 This node only exposes a subset of Stage's functionality via ROS. Specifically, it finds the Stage models of type laser, camera and position, and maps these models to the ROS topics given below. If at least one laser/camera and position model are not found, stageros exits.
 
@@ -93,7 +112,7 @@ Stageros only exposes models created by a subset of the `.world` file syntax, sp
     * `depth (sensor_msgs/Image)`: it pubs depth camera image.
     * `camera_info (sensor_msgs/CameraInfo)`:  it pubs camera calibration info.
     
-    * Usage:
+* Usage:
 ```bash
     rosrun stage_ros stageros [-g runs headless] <world> [standard ROS args]
 ```
@@ -101,18 +120,18 @@ Stageros only exposes models created by a subset of the `.world` file syntax, sp
 ------
 ## Controller Node: robot_controller_node
 
-This node is used to control the robot's driving capabilities inside the circuit. It will command the robot to drive at a certain velocity inside the circuit. thanks to this node the robot will also be able to scan the walls of the track and not hit them. 
-To do so, the robot robot subscibes and publishes to the following topics:
+This node controls the robot's driving capabilities inside the circuit. It will command the robot to drive at a certain velocity inside the track. Thanks to this node, the robot will also be able to scan the walls of the circuit and not hit them. 
+The robot subscribes and publishes to the following topics:
 
-* The node **publishes** to the `cmd_vel geometry_msgs/Twist` Topic to change the *linear* and *angular* velocity's values related to the robot.
+* The node **publishes** to the `cmd_vel geometry_msgs/Twist` Topic to change the *linear* and *angular* velocity values related to the robot.
 
 * The node **subscribes** to the following topics:
 
     * `base_scan (sensor_msgs/LaserScan)`:  which will provide the node with Data about the enviroment surrouding the robot.
     * `Acc (second_assignment/Acc)`:  Which will tell the node how much to increase the *linear* velocity of the robot on the `cmd_vel` Topic.
     
-On the  `cmd_vel` Topic, the Simulation Node pubblishes all the information acquired by the laserScanner set. The robot is equiped with 721 lasers that retrive information about the relative distance between the center of the robot and the walls of the circuit. The lasers reach a 30 units distance and they are placed on a 180º degrees span infornt of the robot. The scanning Rate is 10 hz.
-The following picture gives a visual rappresentation of the lasers inside the enviroment:
+On the  `cmd_vel` Topic, the Simulation Node publishes all the information acquired by the laser scanner set. The robot is equipped with 721 lasers that retrieve information about the relative distance between the center of the robot and the walls of the circuit. The lasers reach a 30 units distance, and they cover a 180º degrees span in front of the robot. The scanning rate is 10 Hz.
+The following picture gives a visual representation of the lasers inside the environment:
 
 <p align="center">
  
@@ -120,10 +139,10 @@ The following picture gives a visual rappresentation of the lasers inside the en
 
 </p>
 
-Thanks to the subscription of the node to the `base_scan` topic, the *CallBack* function of the node will always be able to know what the robot sees infront of it. 
-To let the robot make its way around the circuit, I implemented a simple code which exploits the Data acquired by the laser scans.
-The Data comming from the scanners is composed by two different arrays. One related to the **intecity** of the lasers the other one to the **scan ranges**. I used the second array to collect the relaiable information to manage the robot's navigation speed. 
-I devided the area covered by the lasers in three main areas each one composed by 100 lasers. The first one covers form the the index 0 to 100, the following one form 310 to 410 and the last one from 620 to 720. Thanks to the function `mini(float array [720], int starting_index, int n_lasers)`, the detecting areas will return the minimum distance value registerd by the lasers. 
+Thanks to the node's subscription to the `base_scan` topic, the *CallBack* function of the node will always know what the robot sees in front of it. 
+To let the robot make its way around the circuit, I implemented a simple code that exploits the Data acquired by the laser scans.
+The Data coming from the scanners is composed of two different arrays. One related to the **intensity** of the lasers the other one to the **scan ranges**. I used the second array to collect reliable information to manage the robot's navigation speed. 
+I decided the area covered by the lasers in three main areas each one composed of 100 lasers. The first one covers form the index 0 to 100, the following one forms 310 to 410, and the last one from 620 to 720. Thanks to the function `mini(float array [720], int starting_index, int n_lasers)`, the detecting areas will return the minimum distance value registered by the lasers. 
 
 * *INPUTS*:
     * `float arr[720]`: The ranges' array. 
@@ -153,19 +172,17 @@ float mini ( float arr[720], int ind=0, int size=720){
 
 The `robotCallBack` function implements a cycle that will determine what velocity to publish on the `cmd_vel`  topic.
 
-As a "default state", the robot will move around the circuit at a costant velocity of 1.0 towards its relative X-Axis resulting in a motion. 
-Once the middle detecting area will register a distance shorter than 1.5 units, the robot will stop driving forward and it will start checking on the other areas. These detecting zones are located at the sides of the robot. Thanks to an if-statemnt, the code will check if the shortest distance is detected on the right side or on the left side of the robot. Depending on this decision, the robot will decide to either turn left or right to get away of the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity of 1.0 and a linear velocity of 0.2. To be sure to keep a distance from the walls, once the side detecting areas detect one, the code will set a linear velocity along the Y-Axis towads the opposite directions of the closest bareer. 
-The following *gif* shows the robot approaching a tight turn:
+As a "default state", the robot will move around the circuit at a constant velocity of 1.0 towards its relative X-Axis resulting in a motion. 
+Once the middle detecting area scans a distance shorter than 1.5 units, the robot will stop driving forward and it'll check on the other detecting regions. These areas are on the left and right sides of the robot. Since the two regions retrieve the robot's distance to the wall, an if-statement can decide on what side the closest barrier is. Depending on this decision, the robot will either turn left or right to get away from the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity of 1.0 and a linear velocity of 0.2. To be sure to keep a distance from the walls, once the side detecting areas detect one, the code will set a linear speed along the Y-Axis towards the opposite directions of the closest border. 
+The following *gif* shows the robot approaching a tight turn: 
 
 <p align="center">
  
+![ezgif-6-ba821d419f16](https://user-images.githubusercontent.com/91262561/143498173-8fb3dbb9-4301-41e3-94b0-900876ed5640.gif)
  
- ![ezgif-6-ba821d419f16](https://user-images.githubusercontent.com/91262561/143498173-8fb3dbb9-4301-41e3-94b0-900876ed5640.gif)
-
-
 </p>
 
-At the end of the cycle, the velocity will be published in the `cmd_vel` and it will be read by the symulation node which will make the robot move the robot correctly.
+At the end of the cycle, the velocity will be published on the `cmd_vel` topic. The simulation node will read the new speed value and it'll make the robot move correctly.
 
 `robotCallBack`:
 
@@ -220,7 +237,8 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 }
 ```
 
-`accellerator` is a *CallBack* that subscribes to the `Acc` Topic to retrive the accelleration factor set by the UI inteface. The *CallBack* will associate the new coefficent to the global  variable `acc` which will set the new speed at every cycle. 
+`accelerator` is a *CallBack* that subscribes to the `Acc` Topic to retrieve the acceleration factor set by the UI interface. The *CallBack* will associate the new coefficient to the global variable `acc` which will set the new speed at every cycle. 
+
 * The following code shows the *callBack* `accelerator` of the node:
 
 ```cpp
@@ -245,18 +263,18 @@ rosrun second_assignment robot_controller_node
 ------
 ## Server Node: input_node
 
-This node is used to manage the acceleration factor of the robot. The Server node exploits the *custom server* `second_assignment/Accelerate` to recive a **request** and produce a **response** in the UI node. 
-The `input_node` implements the service that desides either to encrese or decrese the speed of the robot or to reset the loaction of the robot to the starting position.
-The service is advertized inside of the *bool callBack*  `char_input`. The **request** associated to a `char` value will either:
+This node manages the acceleration factor of the robot. The Server node exploits the *custom server* `second_assignment/Accelerate` to receive a **request** and produce a **response** in the UI node. 
+The `input_node` implements the service that decides either to increase or decrease the robot's speed and to reset the robot's location to the starting position.
+The service is advertised inside of the *bool function*  `char_input`. The **request** associated with a `char` value will either:
 
 * Send a **response** to *increase* the acceleration factor by 0.5 units if the `char` value is equal to `a`,
 * Send a **response** to *decrease* the acceleration factor by 0.5 units if the `char` value is equal to `s`,
 * Call the service `/reset_positions (std_srvs/Empty)` to RESET the position of the robot  if the `char` value is equal to `r`,
 * Give an ERROR message if any other  `char` value is entered.
 
-Once either the  `a` or the  `s` key are pressed, the gloabal variable  `acc` will either encrese or decrese by half a unit. This variable will later be assigned to the **response** of the service. 
+Once either the  `a` or the  `s` key are pressed, the global variable  `acc` will either increase or decrease by half a unit. This variable will later be assigned to the **response** of the service. 
 
-* The following code shows the *bool callBack* `char_input` of the node:
+* The following code shows the *bool function* `char_input` of the node:
 
 ```cpp
 
@@ -294,12 +312,12 @@ rosrun second_assignment input_node
 ------
 ## UI Node: UI_node
 
-The UI_node is the interface through which the user is able to interact with the simulation.
+The UI_node is the interface through which the user can interact with the simulation.
 The *CallBack* function will ask the user to enter a char variable to INCREMENT or DECREMENT the robot velocity or RESET its position. 
-The `std::cin>>` will associate the `char` input to a `char` variable that will later be passed as a **request** of the *ros::ServiceClient client1*. The client will send the request to a service of type `/Accelerate`. The service will associate the read `char` to the increase or the decrease of the speed variable. The node will later associate the **response** of the service to the `float` variable of the `my_acc.a (second_assignment/Acc)` variable of the custom message `Acc`. At last, the `float` varable will be **published** to the Topic to pass athe information about the acceleration fator iside the controller. 
+The `std::cin>>` will associate the `char` input to a `char` variable that will later be passed as a **request** of the *ros::ServiceClient client1*. The client will send the request to a service of type `/Accelerate`. The service will associate the read `char` to the increase or the decrease of the speed variable. The node will later associate the **response** of the service to the `float` variable of the `my_acc.a (second_assignment/Acc)` variable of the custom message `Acc`. At last, the `float` variable will be **published** to the Topic to pass the information about the acceleration factor inside the controller. 
 
-* The node **publishes** to the `Acc (second_assignment/Acc)` topic on which the node will tell publish the encrease of *linear* velocity of the robot.
-* The node **subscribes**  to the `base_scan (sensor_msgs/LaserScan)` topic  which will provide the *CallBack* with capability of endlessly spin.
+* The node **publishes** to the `Acc (second_assignment/Acc)` topic on which the node will publish the increase of *linear* velocity of the robot.
+* The node **subscribes**  to the `base_scan (sensor_msgs/LaserScan)` topic which will provide the *CallBack* with the capability of endlessly spinning.
 
 * The following code shows  the robotCallBack:
 
@@ -351,23 +369,23 @@ reasoning behind the structure of the project
 --------------------
 The flowchart is composed by:
 
-* **Green** and **yallow** boxs that rappresents the *Ros nodes* required to run the simulation,
-* **Red** ovals rappresenting the *topics* needed by the nodes to exchange data and
+* **Green** and **yallow** boxs that rappresent the *Ros nodes* required to run the simulation,
+* **Red** ovals rappresenting the *topics* the nodes read to exchange data and
 * **Light blue** ovals to show all the requests and responses of *services*. 
 
-The whole system is controlled by the **Controller Node**. This program deals with the navigation takeing care of the following tasks:
+The whole system is controlled by the **Controller Node**. This program deals with the robot's navigation taking care of the following tasks:
 
-* It recives a costant flow of information about the  robot's surroundings thanks to the subscription to the */Base_scan* topic.
+* It receives a constant flow of information about the robot's surroundings thanks to the subscription to the */Base_scan* topic.
 * This Data is managed by the *robotCallBack* to publish the proper robot's velocity parameters on the */Cmd_vel* topic. 
-* Thanks to the */Acc* topic's subscription, the node will also take care of the change of the robot's speed choose by the user in the *UI node*.
+* Thanks to the */Acc* topic's subscription, the node will also take care of the change of the robot's speed chosen by the user in the *UI node*.
 
-The **UI Node** has the role of takeing KeyBoard inputs from the user and sending their responses to the system. The program comunicates the the other nodes as it follows: 
+The **UI Node** has the role of taking KeyBoard inputs from the user and sending their responses to the system. The program communicates the other nodes as it follows: 
 
-* It recives inforation from the user's input with a  `std::cin>>`.
-* The Input will be sent as a riquest to the *Server Node* that will turn the given input into a resposne regarding the increase/decrease speed factor.
+* It receives information from the user's input with a  `std::cin>>`.
+* The Input will be sent as a request to the *Server Node* that will turn the given input into a response regarding the increase/decrease speed factor.
 * This value will be sent to the controller node that will add it to the current linear velocity.
 
-The **Input Node** works a a *service* for the requests sent by the *UI Node* for managing the robot's speed and the RESET condition of the system. Depending on what kind of input the node will recive, the service could either:
+The **Input Node** works as a *service* for the requests sent by the *UI Node* for managing the robot's speed and the RESET condition of the system. Depending on what kind of input the node will receive, the service could either:
 
 * INCREMENT the robot's speed if the given input is the `a` char or, 
 * DECREMENT the robot's speed if the given input is the `s` char or, 
@@ -385,14 +403,14 @@ https://user-images.githubusercontent.com/91262561/143498300-ba1dee74-d5ef-467e-
 
 Possible improvements
 -----------------
-During the development of the code I came up with some few ideas that could lead to a deep improvement of the driving capabilities of the robot. I also implemented a simpler version of the package based on a smaller number of Ros nodes utilized. 
+During the development of the code, I came up with a few ideas that could lead to some improvement of the driving capabilities of the robot. I also implemented a simpler version of the package based on a smaller number of Ros nodes utilized. 
 
-* With the implementation I came up so far, once the robot gets close to a maze's wall it will stop the forward motion and will start checking the sides to see where the closest wall is. Thanks to an if-statement, the robot will know whether the closest wall is to its right o to its left and it will accordingly assign an angular rotation to turn away of thr wall. Since the motor sensors return an highly updated data set about the robot's surroundings, the idea I had was to implement a code capable of makeing the robot always keep to its front the detection area with the longest distance detected. This approach to the development of the robot's movement would theoretically keep the robot's orientation always towards the most free direction. However, the coding of this logic didn't lead to a feasible solution. The main issue related to the use of this logic comes form the scanning capabilities of the laser scanners. During the approach tight turns, the lasers will indentify the longest distance towards a direction slightly covered by a wall. This will cause the robot to follow the scanner direction and eventually hit the wall. Fixing this issue could lead to a nicer logic that could handle higer robots' velocities. 
+* With the implementation I came up with so far, once the robot gets close to a maze's border, it will stop the forward motion and will start checking the sides to see where the closest wall is. Thanks to the laser scans, the robot will know whether the closest wall to the robot is to the robot's right to or left. It will accordingly assign an angular rotation to turn away from the wall. Since the motor sensors return a highly updated data set about the robot's surroundings, the idea I had was to implement a code capable of making the robot always keep to its front the detection area with the longest distance detected. This different approach to the development of the robot's movement would theoretically keep the robot's orientation always towards the freest direction. However, the coding of this logic didn't lead to a feasible solution. The main issue related to this way of reasoning comes from the scanning capabilities of the laser scanners. During the approach of tight turns, the lasers will identify the longest distance towards a direction slightly covered by a wall. This detection will cause the robot to follow the laser scanner's direction and eventually hit the wall. Fixing this issue could lead to a nicer logic that could handle higher robots' velocities. 
 
-* Another implementation I succesfully built relies on a less modular structure of the nodes comunicatin scheme. Instead of implementing a separate Ros node for the implementation of the *service*, I coded it inside the controller node. This verision of the project simplifies the comunication net between all the nodes (the user should only launch 3 nodes instead of 4). Though, the modularity of this version of the project would be slightly penalized cause of the removal of one Ros Node. According to the objective of mantaining an higer modularity for the project I decided to keep the 4-nodes version as the final one.
+* Another implementation I successfully built relies on a less modular structure of the nodes' communication scheme. Instead of executing a separate Ros node for implementing the *service*, I coded it inside the controller node. This project version simplifies the communication net between all the nodes (the user should only launch three nodes instead of four). Though, the modularity of this version of the project would be slightly penalized cause of the removal of one Ros Node. According to the objective of maintaining a more modular project, I decided to keep the 4-nodes version as the final one.
 
 
 Conclusions
 -----------------
-To take care of all the project's requests, I choose to manage the code's structure with modular logic. Thanks to this approach, I was able to get to the end of the assignment with a schematic structure of the project concerning 4 Ros nodes overall.  Thanks to the well-chosen parameters given to the controlling node, the robot can autonumusly drive around the circuit for many laps at differet velocities. The whole implementation makes the robot capable of lapping flawlessly at an highest velocity pick of 11-12 units. 
-This project was my first approach to the ROS1 workflow. Working on this assignment, I gained knowledge about the basic concepts of ROS such as managing *callBack* functions, implementing new *services* and *messages* and building a modular and clearly organized *pakage* structure. 
+To take care of all the project's requests, I choose to manage the code's structure with modular logic. Thanks to this approach, I was able to get to the end of the assignment with a schematic structure of the project concerning 4 Ros nodes overall.  Thanks to the well-chosen parameters given to the controlling node, the robot can autonomously drive around the circuit for many laps at different velocities. The whole implementation makes the robot capable of lapping flawlessly at the highest velocity pick of 11-12 units. 
+This project was my first approach to the ROS1 workflow. Working on this assignment, I gained knowledge about the basic concepts of ROS such as managing *callBack* functions, implementing new *services* and *messages* and building a modular and organized *package* structure. 
