@@ -74,15 +74,20 @@ roslaunch second_assignment run.launch
 ```
 
 the launch script lets the user start the whole project with just one command. The following code shows all the instructions sent by the launch program.
-```bash
+```xml
 
 <launch>
-  <node name="carcontroller_node" pkg="second_assignment" type="carcontroller_node" required="true"/>
-  
-  <node name="UI_node" pkg="second_assignment" type="UI_node" output="screen" launch-prefix="xterm -fg white -bg black -e "  required="true"/>
-  
+  <node name="robot_controller_node" pkg="second_assignment" type="robot_controller_node" required="true"/>
+  <node name="input_node" pkg="second_assignment" type="input_node" output="screen" launch-prefix="terminator -fg white -bg black -e "  required="true"/>
+  <node name="UI_node" pkg="second_assignment" type="UI_node" output="screen" launch-prefix="terminator -fg white -bg black -e "  required="true"/>
   <node name="stageros" pkg="stage_ros" type="stageros" required ="true" args = "$(find second_assignment)/world/my_world.world"/>
 </launch>
+```
+This kind of execution needs the Xterm terminal to be installed. If the it's not already installed you can download it with the following shell command:
+
+```bash
+
+sudo apt-get install -y xterm
 ```
 
 ------
