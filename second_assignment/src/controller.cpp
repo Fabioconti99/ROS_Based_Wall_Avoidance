@@ -6,14 +6,19 @@
 #include "second_assignment/Acc.h"
 #include "std_srvs/Empty.h"
 
-
+// Initiaslization of the publisher needed to send the velocity values through the
+// /cmd_vel topic to the simulation node.
 ros::Publisher pub;
+
+// Twist message for assigning the robot's speed.
 geometry_msgs::Twist my_vel;
 
+// Initialization of the coefficient added to the linear velocity param in order to encrise it.
 float acc=0;
 
 
-
+// Function to retrive the lower value among a certain span of the laser scan set
+// which the robot is equiped with.
 float mini ( float arr[720], int ind=0, int size=720){
 
 
@@ -27,6 +32,7 @@ float mini ( float arr[720], int ind=0, int size=720){
 	return val;
 }
 
+// Implementation of the required service within the controller script.
 
 //bool char_input (second_assignment::Accelerate::Request &req, second_assignment::Accelerate::Response &res)
 //{ 
@@ -62,18 +68,28 @@ float mini ( float arr[720], int ind=0, int size=720){
 //}
 
 
+// CallBack needed by the node to costantly retrieve data about the laser-scans.
+
+// Subsctiption to the /base_scan  topic which contains the updated data about what
+// the laser-scanners see.
 void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg/*, const second_assignment::Acc::ConstPtr& msg1*/)
 {
 
-	
+	// Shell print of the updated distance of just one of the distances retrived by
+    // the laserScan set.
 	ROS_INFO("Turtle subscriber@ [%f] ",msg->ranges[360]);
-		
+    
+    
+    
+        // Assigning all the retrived values to a different array in order to
+        // exploit the collected data.
 		float laser[721];
-		
 		for(int i=0;i<721;i++){
 		laser[i]=msg->ranges[i];
 		}
 		
+        // If the closest distance detected by the set of lasers in fornt of the
+        // robot is higher than 1.5 units the robot will travel straight.
 		if (mini(laser,310,100)>1.5 ){
 		
 			my_vel.linear.x = 1.0+acc;
@@ -81,8 +97,13 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg/*, const second_a
 				
 		} 
 		
+    // If the closest distance detected by the set of lasers in fornt of the
+    // robot is lower than 1.5 units:
 		else{
-		
+            
+            // the robot will check the sides and it will turn towards the opposit
+            // direction of the closest wall.
+            // Following this rule, the robot will avoid hitting the wall
 			if (mini(laser,0,100)<mini(laser,620,100)){
 			
 				my_vel.linear.x = 0.2;
@@ -114,32 +135,42 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg/*, const second_a
 		 
 		 
 		 
-		
+		// Pubblishing the velocity values
 		pub.publish(my_vel);
 
 
 
 }
 
+// CallBack function to update the velocity factor.
 void accelerator(const second_assignment::Acc::ConstPtr& msg1)
 {
+    // Assigning the updated accelleration value to the acc global variable
 	acc=msg1->a;
-	std::cout<<msg1->a<<"\n";
+    
+    // Returnung to the shell the value the newly-updated velocity coefficient.
+    ROS_INFO("[%f]",acc+1.0);
 }
 
 
 int main (int argc, char **argv) 
 {
-	// Initialize the node, setup the NodeHandle for handling the communication with the ROS //system
+	// Initialize the node, setup the NodeHandle for handling the communication
+    //with the ROS system
 	ros::init(argc, argv, "robot_controller"); 
 	ros::NodeHandle nh;
 	
-	//ros::ServiceServer service = nh.advertiseService("/accelerate",char_input); 
-	ros::Subscriber sub = nh.subscribe("/base_scan", 1000,robotCallback); 
+	//ros::ServiceServer service = nh.advertiseService("/accelerate",char_input);
+    
+    // Initialize the two subscribers for both the call backs.
+	ros::Subscriber sub = nh.subscribe("/base_scan", 1000,robotCallback);
 	ros::Subscriber sub1 = nh.subscribe("/acc", 1000,accelerator);
 	
+    // Initialize the publisher needed to publish the new velocity values to update
+    // the robot's speed.
 	pub = nh.advertise<geometry_msgs::Twist> ("/cmd_vel", 1000);
-
+    
+    // Calling Back the call back.
 	ros::spin();
 	
 	return 0;
