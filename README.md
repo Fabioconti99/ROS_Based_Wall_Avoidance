@@ -322,7 +322,7 @@ The *CallBack* function will ask the user to enter a char variable to INCREMENT 
 The `std::cin>>` will associate the `char` input to a `char` variable that will later be passed as a **request** of the *ros::ServiceClient client1*. The client will send the request to a service of type `/Accelerate`. The service will associate the read `char` to the increase or the decrease of the speed variable. The node will later associate the **response** of the service to the `float` variable of the `my_acc.a (second_assignment/Acc)` variable of the custom message `Acc`. At last, the `float` variable will be **published** to the Topic to pass the information about the acceleration factor inside the controller. 
 
 * The node **publishes** to the `Acc (second_assignment/Acc)` topic on which the node will publish the increase of *linear* velocity of the robot.
-* The node **subscribes**  to the `base_scan (sensor_msgs/LaserScan)` topic which will provide the *CallBack* with the capability of endlessly spinning.
+* The node doesen't **subscribe**  to any topic but it just spins in a while loop inside the main function.
 
 * The following code shows  the robotCallBack:
 
