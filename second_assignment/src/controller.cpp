@@ -104,20 +104,33 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg/*, const second_a
             // the robot will check the sides and it will turn towards the opposit
             // direction of the closest wall.
             // Following this rule, the robot will avoid hitting the wall
-			if (mini(laser,0,100)<mini(laser,620,100)){
+			if (mini(laser,0,100)<mini(laser,620,100) && mini(laser,0,100)<mini(laser,200,100) && mini(laser,0,100)<mini(laser,420,100)){
 			
-				my_vel.linear.x = 0.2;
-				my_vel.angular.z = 1.0; 
+				my_vel.linear.x = 0.3;
+				my_vel.angular.z = 2.0; 
 			}
 			
-			else{
+			if (mini(laser,620,100)<mini(laser,0,100) && mini(laser,620,100)<mini(laser,200,100) && mini(laser,620,100)<mini(laser,420,100)){
 			
-				my_vel.linear.x = 0.2;
-				my_vel.angular.z = -1.0; 
+				my_vel.linear.x = 0.3;
+				my_vel.angular.z = -2.0; 
 			
 			}
-		
-		
+			
+			if (mini(laser,200,100)<mini(laser,620,100) && mini(laser,200,100)<mini(laser,0,100) && mini(laser,200,100)<mini(laser,420,100)){
+			
+				my_vel.linear.x = 0.6;
+				my_vel.angular.z = 2.0; 
+			
+			}
+			
+			if (mini(laser,420,100)<mini(laser,200,100) && mini(laser,420,100)<mini(laser,620,100) && mini(laser,420,100)<mini(laser,0,100)){
+			
+				my_vel.linear.x = 0.6;
+				my_vel.angular.z = -2.0; 
+			
+			}
+			
 		}
 		 
 		 

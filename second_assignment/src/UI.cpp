@@ -63,7 +63,7 @@ int main (int argc, char **argv)
     
     while(ros::ok()){
         
-        // robotCallback();
+        robotCallback();
         // Callback of the callback function.
         ros::spinOnce();
     }

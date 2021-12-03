@@ -147,7 +147,7 @@ The following picture gives a visual representation of the lasers inside the env
 Thanks to the node's subscription to the `base_scan` topic, the *CallBack* function of the node will always know what the robot sees in front of it. 
 To let the robot make its way around the circuit, I implemented a simple code that exploits the Data acquired by the laser scans.
 The Data coming from the scanners is composed of two different arrays. One related to the **intensity** of the lasers the other one to the **scan ranges**. I used the second array to collect reliable information to manage the robot's navigation speed. 
-I decided the area covered by the lasers in three main areas each one composed of 100 lasers. The first one covers form the index 0 to 100, the following one forms 310 to 410, and the last one from 620 to 720. Thanks to the function `mini(float array [720], int starting_index, int n_lasers)`, the detecting areas will return the minimum distance value registered by the lasers. 
+I devided the area covered by the lasers in five main areas each one composed of 100 lasers. The first one covers form the index 0 to 100, the following one from 200 to 300, than 310 to 410, 420 to 520 and the last one from 620 to 720. Thanks to the function `mini(float array [720], int starting_index, int n_lasers)`, the detecting areas will return the minimum distance value registered by the lasers. 
 
 * *INPUTS*:
     * `float arr[720]`: The ranges' array. 
@@ -178,7 +178,7 @@ float mini ( float arr[720], int ind=0, int size=720){
 The `robotCallBack` function implements a cycle that will determine what velocity to publish on the `cmd_vel`  topic.
 
 As a "default state", the robot will move around the circuit at a constant velocity of 1.0 towards its relative X-Axis resulting in a motion. 
-Once the middle detecting area scans a distance shorter than 1.5 units, the robot will stop driving forward and it'll check on the other detecting regions. These areas are on the left and right sides of the robot. Since the two regions retrieve the robot's distance to the wall, an if-statement can decide on what side the closest barrier is. Depending on this decision, the robot will either turn left or right to get away from the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity of 1.0 and a linear velocity of 0.2. To be sure to keep a distance from the walls, once the side detecting areas detect one, the code will set a linear speed along the Y-Axis towards the opposite directions of the closest border. 
+Once the middle detecting area scans a distance shorter than 1.5 units, the robot will stop driving forward and it'll check on the other detecting regions. These areas are on the left and right sides of the robot. Since the four regions retrieve the robot's distance to the wall, an if-statement can decide on what region the closest barrier is. Depending on this decision, the robot will either turn left or right to get away from the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity of 1.0 and a linear velocity of 0.3 if the detecting area triggered are the once to the total right or left of the robot. If the closest wall is detected in one of the other middle sections, the angular speed will be the same as before but the robot will keed an higher linear speed of 0.6. 
 The following *gif* shows the robot approaching a tight turn: 
 
 <p align="center">
@@ -199,11 +199,11 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
     ROS_INFO("Turtle subscriber@ [%f] ",msg->ranges[360]);
     
         float laser[721];
-        
         for(int i=0;i<721;i++){
         laser[i]=msg->ranges[i];
         }
         
+        // FRONT SECTION OF DETECTION
         if (mini(laser,310,100)>1.5 ){
         
             my_vel.linear.x = 1.0+acc;
@@ -212,33 +212,41 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
         } 
         
         else{
-        
-            if (mini(laser,0,100)<mini(laser,620,100)){
             
-                my_vel.linear.x = 0.2;
-                my_vel.angular.z = 1.0; 
+            // RIGHT SECTION OF DETECTION
+            if (mini(laser,0,100)<mini(laser,620,100) && mini(laser,0,100)<mini(laser,200,100) && mini(laser,0,100)<mini(laser,420,100)){
+            
+                my_vel.linear.x = 0.3;
+                my_vel.angular.z = 2.0; 
             }
             
-            else{
+            // LEFT SECTION OF DETECTION
+            if (mini(laser,620,100)<mini(laser,0,100) && mini(laser,620,100)<mini(laser,200,100) && mini(laser,620,100)<mini(laser,420,100)){
             
-                my_vel.linear.x = 0.2;
-                my_vel.angular.z = -1.0; 
+                my_vel.linear.x = 0.3;
+                my_vel.angular.z = -2.0; 
+            
+            }
+            
+            // UPPER RIGHT SECTION OF DETECTION
+            if (mini(laser,200,100)<mini(laser,620,100) && mini(laser,200,100)<mini(laser,0,100) && mini(laser,200,100)<mini(laser,420,100)){
+            
+                my_vel.linear.x = 0.6;
+                my_vel.angular.z = 2.0; 
+            
+            }
+            
+            // UPPER LEFT SECTION OF DETECTION
+            if (mini(laser,420,100)<mini(laser,200,100) && mini(laser,420,100)<mini(laser,620,100) && mini(laser,420,100)<mini(laser,0,100)){
+            
+                my_vel.linear.x = 0.6;
+                my_vel.angular.z = -2.0; 
+            
             }
         }
-         
-         if (mini(laser, 0,50)<0.2){
-             my_vel.linear.y= 1.5;
-         }
-         else {
-             if (mini(laser, 620,50)<0.2){
-                 my_vel.linear.y= -1.5;
-             }
-             else {
-             my_vel.linear.y= 0.0;
-             }
-         }
-         
+        
         pub.publish(my_vel);
+
 }
 ```
 
@@ -261,7 +269,7 @@ rosrun second_assignment robot_controller_node
 
 <p align="center">
 
-<img height="600" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/flow2.png">
+<img height="1000" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/flow2.png">
 
 </p>
 
