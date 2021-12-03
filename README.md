@@ -140,7 +140,7 @@ The following picture gives a visual representation of the lasers inside the env
 
 <p align="center">
  
-<img width="456" alt="laser_scanner" src="https://user-images.githubusercontent.com/91262561/143497570-fc64e014-f41a-4a99-990c-1cc71a7cfe95.png">
+<img width="456" alt="143497570-fc64e014-f41a-4a99-990c-1cc71a7cfe95" src="https://user-images.githubusercontent.com/91262561/144588350-b510d300-13f9-4b84-9949-3d3503a3791b.png">
 
 </p>
 
