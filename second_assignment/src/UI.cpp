@@ -6,39 +6,36 @@
 #include "second_assignment/Acc.h"
 #include "std_srvs/Empty.h"
 
-// Publisher to the custom topic
+// Publisher to the custom topic.
 ros::Publisher pub;
 
-// Client to the custom service to get the response for updateing the velocity
-// factor.
+// Client to the custom service to get the response for updateing the velocity factor.
 ros::ServiceClient client1;
 
-
-// CallBack needed for the UI_node to always get the info
-void robotCallback()
+// Function needed for the UI_node to always be ready to ask the user for encreasing or decreasing the robot's speed.
+void Interaction()
 {
 	
-	// Custom message with which it'll send the updated data to the controller.
+	// Custom message with which will send the updated data to the controller.
 	second_assignment::Accelerate acc_srv;
 		
-    // Input to retrive the input from the user.
+    // Section due to retriving input from the user.
 	char in;
 	std::cout<<"input 'a' to accelerate, 's' to slow down or 'r' to RESET:\n";
 	std::cin>>in;
 		
-    // The request is set as the value input by the user.
+    // The request is set as the user's input value.
 	acc_srv.request.input= in;
 	client1.waitForExistence();
 	client1.call(acc_srv);
 	
-    // Declaration of the castom message message
+    // Declaration of the castom message object.
 	second_assignment::Acc my_acc;
 	
-    // Assigning the value of the response of the service to the custom message
-    // value
+    // Assigning the value of the response of the service to the custom message value.
 	my_acc.a = acc_srv.response.val;
     
-    // Publishing the value
+    // Publishing the value to the correct topic.
 	pub.publish(my_acc);
 	
 }
@@ -46,23 +43,23 @@ void robotCallback()
 
 int main (int argc, char **argv) 
 {
-	// Initialize the node, setup the NodeHandle for handling the communication
-    // with the ROS system
+	// Initialize the node, setup the NodeHandle for handling the communication with the ROS system.
 	ros::init(argc, argv, "UI"); 
 	ros::NodeHandle nh;
     
 	
-    // Initialization of the publisher on the custom topic.
+    // Initialization of the the custom topic's publisher.
 	pub = nh.advertise<second_assignment::Acc> ("/acc", 1);
     
-    // Initialization of the client to the service.
+    // Initialization of the client to the custom service.
 	client1 = nh.serviceClient<second_assignment::Accelerate>("/accelerate");
     
-    // Spin of the function that asks the user what to do.
+    // Loop of the function that asks the user what to do.
     while(ros::ok()){
         
-        robotCallback();
-        // Callback of the callback function.
+        Interaction();
+        
+        // Function to loop the callback function.
         ros::spinOnce();
     }
 	
