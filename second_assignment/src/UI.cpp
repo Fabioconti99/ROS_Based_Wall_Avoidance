@@ -15,9 +15,8 @@ ros::ServiceClient client1;
 
 
 // CallBack needed for the UI_node to always get the info
-void robotCallback(/*const sensor_msgs::LaserScan::ConstPtr& msg*/)
+void robotCallback()
 {
-	// ROS_INFO("subscriber@[%f]", msg->ranges[360]);
 	
 	// Custom message with which it'll send the updated data to the controller.
 	second_assignment::Accelerate acc_srv;
@@ -52,8 +51,6 @@ int main (int argc, char **argv)
 	ros::init(argc, argv, "UI"); 
 	ros::NodeHandle nh;
     
-	// Define the subscriber to robot surroundings detection.
-	// ros::Subscriber sub = nh.subscribe("/base_scan", 1000,robotCallback);
 	
     // Initialization of the publisher on the custom topic.
 	pub = nh.advertise<second_assignment::Acc> ("/acc", 1);
@@ -61,6 +58,7 @@ int main (int argc, char **argv)
     // Initialization of the client to the service.
 	client1 = nh.serviceClient<second_assignment::Accelerate>("/accelerate");
     
+    // Spin of the function that asks the user what to do.
     while(ros::ok()){
         
         robotCallback();

@@ -72,7 +72,7 @@ float mini ( float arr[720], int ind=0, int size=720){
 
 // Subsctiption to the /base_scan  topic which contains the updated data about what
 // the laser-scanners see.
-void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg/*, const second_assignment::Acc::ConstPtr& msg1*/)
+void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
 
 	// Shell print of the updated distance of just one of the distances retrived by
