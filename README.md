@@ -147,7 +147,7 @@ The following picture gives a visual representation of the lasers inside the env
 Thanks to the node's subscription to the `base_scan` topic, the *CallBack* function of the node will always know what the robot sees in front of it. 
 To let the robot make its way around the circuit, I implemented a simple code that exploits the Data acquired by the laser scans.
 The Data coming from the scanners is composed of two different arrays. One related to the **intensity** of the lasers the other one to the **scan ranges**. I used the second array to collect reliable information to manage the robot's navigation speed. 
-I devided the area covered by the lasers in five main areas each one composed of 100 lasers. The first one covers form the index 0 to 100, the following one from 200 to 300, than 310 to 410, 420 to 520 and the last one from 620 to 720. Thanks to the function `mini(float array [720], int starting_index, int n_lasers)`, the detecting areas will return the minimum distance value registered by the lasers. 
+I devided the area covered by the lasers in three main areas each one composed of 100 lasers. The first one covers form the index 0 to 100, the following one forms 310 to 410, and the last one from 620 to 720. Thanks to the function `mini(float array [720], int starting_index, int n_lasers)`, the detecting areas will return the minimum distance value registered by the lasers. 
 
 * *INPUTS*:
     * `float arr[720]`: The ranges' array. 
@@ -178,12 +178,12 @@ float mini ( float arr[720], int ind=0, int size=720){
 The `robotCallBack` function implements a cycle that will determine what velocity to publish on the `cmd_vel`  topic.
 
 As a "default state", the robot will move around the circuit at a constant velocity of 1.0 towards its relative X-Axis resulting in a motion. 
-Once the middle detecting area scans a distance shorter than 1.5 units, the robot will stop driving forward and it'll check on the other detecting regions. These areas are on the left and right sides of the robot. Since the four regions retrieve the robot's distance to the wall, an if-statement can decide on what region the closest barrier is. Depending on this decision, the robot will either turn left or right to get away from the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity of 1.0 and a linear velocity of 0.3 if the detecting area triggered are the once to the total right or left of the robot. If the closest wall is detected in one of the other middle sections, the angular speed will be the same as before but the robot will keed an higher linear speed of 0.6. 
+Once the middle detecting area scans a distance shorter than 1.5 units, the robot will stop driving forward and it'll check on the other detecting regions. These areas are on the left and right sides of the robot. Since the two regions retrieve the robot's distance to the wall, an if-statement can decide on what side the closest barrier is. Depending on this decision, the robot will either turn left or right to get away from the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity that varies depending on the retrived accelleration and a linear velocity of 0.1. The accelleration factor for the angular velocity operates just like the accelleration factor of the linear velocity but scaled down of a `1/4 (=ang_multiplier)` factor. 
 The following *gif* shows the robot approaching a tight turn: 
 
 <p align="center">
  
-![ezgif-6-ba821d419f16](https://user-images.githubusercontent.com/91262561/143498173-8fb3dbb9-4301-41e3-94b0-900876ed5640.gif)
+
  
 </p>
 
@@ -195,57 +195,52 @@ At the end of the cycle, the velocity will be published on the `cmd_vel` topic. 
 
 void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-
-    ROS_INFO("Turtle subscriber@ [%f] ",msg->ranges[360]);
+    // Shell print of the just one of the updated values retrived by the laserScan set.
+    ROS_INFO("Central laser value [%f] ",msg->ranges[360]);
     
+    
+    
+        // Assigning all the retrived values to a different array in order to exploit the collected data.
         float laser[721];
         for(int i=0;i<721;i++){
         laser[i]=msg->ranges[i];
         }
         
-        // FRONT SECTION OF DETECTION
-        if (mini(laser,310,100)>1.5 ){
+        // If the closest distance detected by the lasers'set in fornt of the robot is higher than 1.5 units the robot will
+        // travel straight.
+        if (mini(laser,310,100)>1.5){
         
             my_vel.linear.x = 1.0+acc;
             my_vel.angular.z = 0.0; 
-                
+            
         } 
         
+    // If the closest distance detected by the set of lasers in fornt of the
+    // robot is lower than 1.5 units:
         else{
             
-            // RIGHT SECTION OF DETECTION
-            if (mini(laser,0,100)<mini(laser,620,100) && mini(laser,0,100)<mini(laser,200,100) && mini(laser,0,100)<mini(laser,420,100)){
+            // the robot will check the sides and it will turn towards the opposit
+            // direction of the closest wall.
+            // Following this rule, the robot will avoid hitting the wall.
             
-                my_vel.linear.x = 0.3;
-                my_vel.angular.z = 2.0; 
+        // If the closest wall detected is on the RIGHT SIDE.
+            if (mini(laser,0,100)<mini(laser,620,100)){
+    
+                my_vel.linear.x = 0.1;
+                my_vel.angular.z = 1+(acc*ang_multiplier); 
             }
             
-            // LEFT SECTION OF DETECTION
-            if (mini(laser,620,100)<mini(laser,0,100) && mini(laser,620,100)<mini(laser,200,100) && mini(laser,620,100)<mini(laser,420,100)){
+        // If the closest wall detected is on the LEFT SIDE.
+            else {
             
-                my_vel.linear.x = 0.3;
-                my_vel.angular.z = -2.0; 
-            
-            }
-            
-            // UPPER RIGHT SECTION OF DETECTION
-            if (mini(laser,200,100)<mini(laser,620,100) && mini(laser,200,100)<mini(laser,0,100) && mini(laser,200,100)<mini(laser,420,100)){
-            
-                my_vel.linear.x = 0.6;
-                my_vel.angular.z = 2.0; 
-            
-            }
-            
-            // UPPER LEFT SECTION OF DETECTION
-            if (mini(laser,420,100)<mini(laser,200,100) && mini(laser,420,100)<mini(laser,620,100) && mini(laser,420,100)<mini(laser,0,100)){
-            
-                my_vel.linear.x = 0.6;
-                my_vel.angular.z = -2.0; 
-            
-            }
+                my_vel.linear.x = 0.1;
+                my_vel.angular.z = -1+(-acc*ang_multiplier); 
+            }                
         }
-        
+         
+        // Pubblishing the velocity values
         pub.publish(my_vel);
+
 
 }
 ```
