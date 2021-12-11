@@ -21,7 +21,8 @@ void Interaction()
 		
     // Section due to retriving input from the user.
 	char in;
-	std::cout<<"input 'a' to accelerate, 's' to slow down or 'r' to RESET:\n";
+	ROS_INFO("Input 'a' to accelerate, 's' to slow down or 'r' to RESET:\n");
+	
 	std::cin>>in;
 		
     // The request is set as the user's input value.

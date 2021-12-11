@@ -326,8 +326,8 @@ rosrun second_assignment input_node
 ## UI Node: UI_node
 
 The UI_node is the interface through which the user can interact with the simulation.
-The *CallBack* function will ask the user to enter a char variable to INCREMENT or DECREMENT the robot velocity or RESET its position. 
-The `std::cin>>` will associate the `char` input to a `char` variable that will later be passed as a **request** of the *ros::ServiceClient client1*. The client will send the request to a service of type `/Accelerate`. The service will associate the read `char` to the increase or the decrease of the speed variable. The node will later associate the **response** of the service to the `float` variable of the `my_acc.a (second_assignment/Acc)` variable of the custom message `Acc`. At last, the `float` variable will be **published** to the Topic to pass the information about the acceleration factor inside the controller. 
+The *Interaction* function will ask the user to enter a char variable to INCREMENT or DECREMENT the robot velocity or RESET its position. 
+The `std::cin>>` will associate the `char` input to a `char` variable that will later be passed as a **request** of the *ros::ServiceClient client1*. The client will send the request to a service of type `/Accelerate`. The service will associate the read `char` to the increase or the decrease of the speed variable. The node will later associate the **response** of the service to the `float` variable of the `my_acc.a (second_assignment/Acc)` variable of the custom message `/acc`. At last, the `float` variable will be **published** to the Topic to pass the information about the acceleration factor inside the controller. 
 
 * The node **publishes** to the `Acc (second_assignment/Acc)` topic on which the node will publish the increase of *linear* velocity of the robot.
 * The node doesen't **subscribe**  to any topic but it just spins in a while loop inside the main function.
@@ -336,26 +336,29 @@ The `std::cin>>` will associate the `char` input to a `char` variable that will 
 
 ```cpp
 
-void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
+void Interaction()
 {
-    ROS_INFO("subscriber@[%f]", msg->ranges[360]);
     
-    
+    // Custom message with which will send the updated data to the controller.
     second_assignment::Accelerate acc_srv;
         
+    // Section due to retriving input from the user.
     char in;
     std::cout<<"input 'a' to accelerate, 's' to slow down or 'r' to RESET:\n";
     std::cin>>in;
         
+    // The request is set as the user's input value.
     acc_srv.request.input= in;
-        
     client1.waitForExistence();
     client1.call(acc_srv);
     
+    // Declaration of the castom message object.
     second_assignment::Acc my_acc;
     
+    // Assigning the value of the response of the service to the custom message value.
     my_acc.a = acc_srv.response.val;
     
+    // Publishing the value to the correct topic.
     pub.publish(my_acc);
     
 }

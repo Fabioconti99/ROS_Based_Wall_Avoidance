@@ -45,7 +45,9 @@ bool char_input (second_assignment::Accelerate::Request &req, second_assignment:
 	
     
 	res.val = acc;
-	std::cout<<res.val<<"\n";
+	
+	ROS_INFO("[%f] ",res.val+1);
+	
 	return true; 
 }
 

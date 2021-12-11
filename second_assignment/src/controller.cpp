@@ -16,6 +16,12 @@ geometry_msgs::Twist my_vel;
 // Initialization of the coefficient added to the linear velocity param in order to encrise the total speed's value.
 float acc=0;
 
+// Initialization of the distance threashold variables for the managing of the robot's speed.
+float front_th = 1.5;
+
+// Initializatioon of the multiplier for regulating the anguar velocity.
+float ang_multiplier=0.25;
+
 
 // Function to retrive the lower value among a given span of the laser scan set.
 float mini ( float arr[720], int ind=0, int size=720){
@@ -37,7 +43,7 @@ float mini ( float arr[720], int ind=0, int size=720){
 void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
 	// Shell print of the just one of the updated values retrived by the laserScan set.
-	ROS_INFO("Turtle subscriber@ [%f] ",msg->ranges[360]);
+	ROS_INFO("Central laser value [%f] ",msg->ranges[360]);
     
     
     
@@ -49,11 +55,11 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 		
         // If the closest distance detected by the lasers'set in fornt of the robot is higher than 1.5 units the robot will
         // travel straight.
-		if (mini(laser,310,100)>1.5 ){
+		if (mini(laser,310,100)>1.5){
 		
 			my_vel.linear.x = 1.0+acc;
 			my_vel.angular.z = 0.0; 
-				
+			
 		} 
 		
     // If the closest distance detected by the set of lasers in fornt of the
@@ -63,43 +69,24 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
             // the robot will check the sides and it will turn towards the opposit
             // direction of the closest wall.
             // Following this rule, the robot will avoid hitting the wall.
-            
-            // If the closest wall detected is on the RIGHT SIDE.
-			if (mini(laser,0,100)<mini(laser,620,100) /*&& mini(laser,0,100)<mini(laser,200,100) && mini(laser,0,100)<mini(laser,420,100)*/){
 			
+		// If the closest wall detected is on the RIGHT SIDE.
+			if (mini(laser,0,100)<mini(laser,620,100)){
+	
 				my_vel.linear.x = 0.1;
-				my_vel.angular.z = 1.0; 
+				my_vel.angular.z = 1+(acc*ang_multiplier); 
 			}
 			
-            // If the closest wall detected is on the LEFT SIDE.
-			if (mini(laser,620,100)<mini(laser,0,100) /*&& mini(laser,620,100)<mini(laser,200,100) && mini(laser,620,100)<mini(laser,420,100)*/){
+		// If the closest wall detected is on the LEFT SIDE.
+			else {
 			
 				my_vel.linear.x = 0.1;
-				my_vel.angular.z = -1.0; 
-			
-			}
-            
-            // If the closest wall detected is on the UPPER RIGHT SIDE.
-			//if (mini(laser,200,100)<mini(laser,620,100) && mini(laser,200,100)<mini(laser,0,100) && mini(laser,200,100)<mini(laser,420,100)){
-			
-			//	my_vel.linear.x = 0.3;
-			//	my_vel.angular.z = 1.0; 
-			
-			//}
-            
-            // If the closest wall detected is on the UPPER LEFT SIDE.
-			//if (mini(laser,420,100)<mini(laser,200,100) && mini(laser,420,100)<mini(laser,620,100) && mini(laser,420,100)<mini(laser,0,100)){
-			
-			//	my_vel.linear.x = 0.3;
-			//	my_vel.angular.z = -1.0; 
-			
-			//}
-			
+				my_vel.angular.z = -1+(-acc*ang_multiplier); 
+			}				
 		}
 		 
 		// Pubblishing the velocity values
 		pub.publish(my_vel);
-
 
 
 }
