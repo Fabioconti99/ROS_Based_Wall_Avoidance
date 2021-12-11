@@ -140,6 +140,7 @@ The following picture gives a visual representation of the lasers inside the env
 
 <p align="center">
  
+<img width="456" alt="143497570-fc64e014-f41a-4a99-990c-1cc71a7cfe95-2" src="https://user-images.githubusercontent.com/91262561/145681009-eea49350-292f-4b75-9582-35a4ef295bad.png">
 
 
 </p>
@@ -183,7 +184,7 @@ The following *gif* shows the robot approaching a tight turn:
 
 <p align="center">
  
-
+![ezgif-6-ba821d419f16](https://user-images.githubusercontent.com/91262561/145681074-b2b2bc3e-fa93-412c-904d-4e3793999d0d.gif)
  
 </p>
 
