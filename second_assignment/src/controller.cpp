@@ -65,35 +65,35 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
             // Following this rule, the robot will avoid hitting the wall.
             
             // If the closest wall detected is on the RIGHT SIDE.
-			if (mini(laser,0,100)<mini(laser,620,100) && mini(laser,0,100)<mini(laser,200,100) && mini(laser,0,100)<mini(laser,420,100)){
+			if (mini(laser,0,100)<mini(laser,620,100) /*&& mini(laser,0,100)<mini(laser,200,100) && mini(laser,0,100)<mini(laser,420,100)*/){
 			
-				my_vel.linear.x = 0.3;
-				my_vel.angular.z = 2.0; 
+				my_vel.linear.x = 0.1;
+				my_vel.angular.z = 1.0; 
 			}
 			
             // If the closest wall detected is on the LEFT SIDE.
-			if (mini(laser,620,100)<mini(laser,0,100) && mini(laser,620,100)<mini(laser,200,100) && mini(laser,620,100)<mini(laser,420,100)){
+			if (mini(laser,620,100)<mini(laser,0,100) /*&& mini(laser,620,100)<mini(laser,200,100) && mini(laser,620,100)<mini(laser,420,100)*/){
 			
-				my_vel.linear.x = 0.3;
-				my_vel.angular.z = -2.0; 
+				my_vel.linear.x = 0.1;
+				my_vel.angular.z = -1.0; 
 			
 			}
             
             // If the closest wall detected is on the UPPER RIGHT SIDE.
-			if (mini(laser,200,100)<mini(laser,620,100) && mini(laser,200,100)<mini(laser,0,100) && mini(laser,200,100)<mini(laser,420,100)){
+			//if (mini(laser,200,100)<mini(laser,620,100) && mini(laser,200,100)<mini(laser,0,100) && mini(laser,200,100)<mini(laser,420,100)){
 			
-				my_vel.linear.x = 0.6;
-				my_vel.angular.z = 2.0; 
+			//	my_vel.linear.x = 0.3;
+			//	my_vel.angular.z = 1.0; 
 			
-			}
+			//}
             
             // If the closest wall detected is on the UPPER LEFT SIDE.
-			if (mini(laser,420,100)<mini(laser,200,100) && mini(laser,420,100)<mini(laser,620,100) && mini(laser,420,100)<mini(laser,0,100)){
+			//if (mini(laser,420,100)<mini(laser,200,100) && mini(laser,420,100)<mini(laser,620,100) && mini(laser,420,100)<mini(laser,0,100)){
 			
-				my_vel.linear.x = 0.6;
-				my_vel.angular.z = -2.0; 
+			//	my_vel.linear.x = 0.3;
+			//	my_vel.angular.z = -1.0; 
 			
-			}
+			//}
 			
 		}
 		 
