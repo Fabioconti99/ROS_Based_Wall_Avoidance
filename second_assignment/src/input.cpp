@@ -5,6 +5,12 @@
 // Global variable of the velocity factor that will be set as the value of the server's response.
 float acc=0;
 
+// Colors for konsole prints.
+const char *red = "\033[0;31m";
+const char *green = "\033[1;32m";
+const char *yellow = "\033[1;33m";
+const char *reset = "\033[0m";
+
 // bool function of the server.
 bool char_input (second_assignment::Accelerate::Request &req, second_assignment::Accelerate::Response &res)
 {
@@ -14,7 +20,7 @@ bool char_input (second_assignment::Accelerate::Request &req, second_assignment:
     // If the input service is 'a', a .5 factor will be added to the acc global variable.
 	if (req.input=='a'){
 	
-		std::cout<<"got a\n";
+		std::printf("got %sa%s\n",green,reset);
 		acc =acc+0.5;
 		
 		
@@ -23,7 +29,7 @@ bool char_input (second_assignment::Accelerate::Request &req, second_assignment:
     // If the input service is 's', a .5 factor will be taken off the acc global variable.
 	if (req.input == 's'){
 	
-		std::cout<<"got s\n";
+		std::printf("got %ss%s\n",yellow,reset);
 		acc =acc-0.5;
 		
 	}
@@ -31,7 +37,7 @@ bool char_input (second_assignment::Accelerate::Request &req, second_assignment:
     // If the input service is 'r', the position of the robot will be reset to the starting position.
 	if (req.input == 'r'){
 	
-		std::cout<<"got r\n";
+		std::printf("got %sr%s\n",red,reset);
 		
 		ros::service::call("/reset_positions", reset_srv);
 		
@@ -39,14 +45,12 @@ bool char_input (second_assignment::Accelerate::Request &req, second_assignment:
 	
     // If any other character is pressed an error message will show up.
 	if (req.input != 's' && req.input != 'r' && req.input != 'a' ){
-		std::cout<<"wrong char\n";
+		std::printf("%swrong input%s\n",red,reset);
 		
 	}
 	
     
 	res.val = acc;
-	
-	ROS_INFO("[%f] ",res.val+1);
 	
 	return true; 
 }

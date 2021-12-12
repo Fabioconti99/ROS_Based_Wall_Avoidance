@@ -19,9 +19,14 @@ float acc=0;
 // Initialization of the distance threashold variables for the managing of the robot's speed.
 float front_th = 1.5;
 
+// Initialization of the integer variable count needed for makeing the robot decellerating a bit when exiting turns.
+int count=0;
+
 // Initializatioon of the multiplier for regulating the anguar velocity.
 float ang_multiplier=0.25;
 
+// Initializatioon of the multiplier for regulating the linear velocity when getting out of turns.
+float lin_multiplier=0.5;
 
 // Function to retrive the lower value among a given span of the laser scan set.
 float mini ( float arr[720], int ind=0, int size=720){
@@ -37,16 +42,17 @@ float mini ( float arr[720], int ind=0, int size=720){
 	return val;
 }
 
-// CallBack needed by the node to costantly retrieve data about the laser-scans.
+// Colors for konsole prints.
+const char *bhyellow = "\e[1;93m";
+const char *bhblue = "\e[1;94m";
+const char *bhwhite = "\e[1;97m";
+const char *reset = "\033[0m";
 
+// CallBack needed by the node to costantly retrieve data about the laser-scans.
 // Subsctiption to the /base_scan  topic which contains the updated data about what the laser-scanners see.
 void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-	// Shell print of the just one of the updated values retrived by the laserScan set.
-	ROS_INFO("Central laser value [%f] ",msg->ranges[360]);
-    
-    
-    
+ 
         // Assigning all the retrived values to a different array in order to exploit the collected data.
 		float laser[721];
 		for(int i=0;i<721;i++){
@@ -57,8 +63,19 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
         // travel straight.
 		if (mini(laser,310,100)>1.5){
 		
-			my_vel.linear.x = 1.0+acc;
-			my_vel.angular.z = 0.0; 
+			// When the count gets to zero the normal velocity will take place again.
+			if ((count--)<=0){
+			
+				std::printf("%sLinear velocity:%s %s%f%s %sAngular velocity:%s %s%f%s \n",bhyellow,reset,bhwhite,1.0+acc,reset,bhblue,reset,bhwhite,0.0,reset);
+				my_vel.linear.x = 1.0+acc;
+				my_vel.angular.z = 0.0;
+			}
+			else{
+				std::printf("%sLinear velocity:%s %s%f%s %sAngular velocity:%s %s%f%s \n",bhyellow,reset,bhwhite,1.0+(acc*lin_multiplier),reset,bhblue,reset,bhwhite,0.0,reset);
+				my_vel.linear.x = 1.0+(acc*lin_multiplier);
+				my_vel.angular.z = 0.0;
+			
+			}
 			
 		} 
 		
@@ -72,17 +89,20 @@ void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 			
 		// If the closest wall detected is on the RIGHT SIDE.
 			if (mini(laser,0,100)<mini(laser,620,100)){
-	
-				my_vel.linear.x = 0.1;
+				std::printf("%sLinear velocity:%s %s%f%s %sAngular velocity:%s %s%f%s \n",bhyellow,reset,bhwhite,0.2,reset,bhblue,reset,bhwhite,1+(acc*ang_multiplier),reset);
+				my_vel.linear.x = 0.2;
 				my_vel.angular.z = 1+(acc*ang_multiplier); 
 			}
 			
 		// If the closest wall detected is on the LEFT SIDE.
 			else {
+				std::printf("%sLinear velocity:%s %s%f%s %sAngular velocity:%s %s%f%s \n",bhyellow,reset,bhwhite,0.2,reset,bhblue,reset,bhwhite,-(1+acc*ang_multiplier),reset);
+				my_vel.linear.x = 0.2;
+				my_vel.angular.z = -(1+acc*ang_multiplier); 
+			}
 			
-				my_vel.linear.x = 0.1;
-				my_vel.angular.z = -1+(-acc*ang_multiplier); 
-			}				
+			// Setting the count to 5 in order to set a slower velovity when the robot comes out of turns.
+			count=5;			
 		}
 		 
 		// Pubblishing the velocity values

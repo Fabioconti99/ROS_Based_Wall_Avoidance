@@ -163,7 +163,6 @@ float mini ( float arr[720], int ind=0, int size=720){
 
 
     float val = 30.0;
-    // Starting value equal to the maximum distance retrivable by the lasers.
     
     for(int i= ind; i<ind+size; i++){
     
@@ -171,15 +170,15 @@ float mini ( float arr[720], int ind=0, int size=720){
             val=arr[i];
         }
     }
-    // Itreturns the minimum value
     return val;
 }
 ```
 
 The `robotCallBack` function implements a cycle that will determine what velocity to publish on the `cmd_vel`  topic.
 
-As a "default state", the robot will move around the circuit at a constant velocity of 1.0 towards its relative X-Axis resulting in a motion. 
-Once the middle detecting area scans a distance shorter than 1.5 units, the robot will stop driving forward and it'll check on the other detecting regions. These areas are on the left and right sides of the robot. Since the two regions retrieve the robot's distance to the wall, an if-statement can decide on what side the closest barrier is. Depending on this decision, the robot will either turn left or right to get away from the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity that varies depending on the retrived accelleration and a linear velocity of 0.1. The accelleration factor for the angular velocity operates just like the accelleration factor of the linear velocity but scaled down of a `1/4 (=ang_multiplier)` factor. 
+As a "default state", the robot will move around the circuit at a constant velocity of 1.0 towards its relative X-Axis resulting in a forward motion. This speed may vary depending on the accelleration factor given by the user. This float number is stored in the `acc` variable which is added to the initial linear speed. Through the `UI node`  the user can either rase or slow down the speed factor by 0.5 notchs.
+Once the middle detecting area scans a distance shorter than 1.5 units, the robot will stop driving forward and it'll check on the other detecting regions. These areas are on the left and right sides of the robot. Since the two regions retrieve the robot's distance to the wall, an if-statement can decide on what side the closest barrier is. Depending on this decision, the robot will either turn left or right to get away from the wall. As a "turning state", the robot will spin around the Z-Axis with an angular velocity that varies depending on the retrived accelleration factor. this value gets added to the angular velocity just like it happens for the linear velocity. The difference between the two is a scaling value of  `1/4 (=ang_multiplier)`  multipling the acceleration factor added to the angular velocity. During turns also a 0.2 linear velocity is added. After every turn, the robot will slow down its speed decreasing the acceleration factor by half for 0.5 seconds. To implement this change of speed an `int count` variable is set to 5 when exiting from a turn. Once the robot will get out of the turning state this variable will decrese by 1 at every *callBack* spin. While this value is still positive the acceleration factor will be devided by 2 makeing it easier for the robot to make it through the turn. When the count will be equal or less than 0 the normal linear speed will take place again. This control makes the robot peform well also when approaching tight turns. 
+
 The following *gif* shows the robot approaching a tight turn: 
 
 <p align="center">
@@ -196,50 +195,43 @@ At the end of the cycle, the velocity will be published on the `cmd_vel` topic. 
 
 void robotCallback(const sensor_msgs::LaserScan::ConstPtr& msg)
 {
-    // Shell print of the just one of the updated values retrived by the laserScan set.
-    ROS_INFO("Central laser value [%f] ",msg->ranges[360]);
-    
-    
-    
-        // Assigning all the retrived values to a different array in order to exploit the collected data.
+ 
         float laser[721];
         for(int i=0;i<721;i++){
         laser[i]=msg->ranges[i];
         }
         
-        // If the closest distance detected by the lasers'set in fornt of the robot is higher than 1.5 units the robot will
-        // travel straight.
         if (mini(laser,310,100)>1.5){
         
-            my_vel.linear.x = 1.0+acc;
-            my_vel.angular.z = 0.0; 
+            if ((count--)<=0){
             
-        } 
-        
-    // If the closest distance detected by the set of lasers in fornt of the
-    // robot is lower than 1.5 units:
-        else{
+                std::printf("%sLinear velocity:%s %s%f%s %sAngular velocity:%s %s%f%s \n",bhyellow,reset,bhwhite,1.0+acc,reset,bhblue,reset,bhwhite,0.0,reset);
+                my_vel.linear.x = 1.0+acc;
+                my_vel.angular.z = 0.0;
+            }
+            else{
+                std::printf("%sLinear velocity:%s %s%f%s %sAngular velocity:%s %s%f%s \n",bhyellow,reset,bhwhite,1.0+(acc*lin_multiplier),reset,bhblue,reset,bhwhite,0.0,reset);
+                my_vel.linear.x = 1.0+(acc*lin_multiplier);
+                my_vel.angular.z = 0.0;
             
-            // the robot will check the sides and it will turn towards the opposit
-            // direction of the closest wall.
-            // Following this rule, the robot will avoid hitting the wall.
-            
-        // If the closest wall detected is on the RIGHT SIDE.
-            if (mini(laser,0,100)<mini(laser,620,100)){
-    
-                my_vel.linear.x = 0.1;
-                my_vel.angular.z = 1+(acc*ang_multiplier); 
             }
             
-        // If the closest wall detected is on the LEFT SIDE.
-            else {
+        } 
+        else{
             
-                my_vel.linear.x = 0.1;
-                my_vel.angular.z = -1+(-acc*ang_multiplier); 
-            }                
+            if (mini(laser,0,100)<mini(laser,620,100)){
+                std::printf("%sLinear velocity:%s %s%f%s %sAngular velocity:%s %s%f%s \n",bhyellow,reset,bhwhite,0.2,reset,bhblue,reset,bhwhite,1+(acc*ang_multiplier),reset);
+                my_vel.linear.x = 0.2;
+                my_vel.angular.z = 1+(acc*ang_multiplier); 
+            }
+            else {
+                std::printf("%sLinear velocity:%s %s%f%s %sAngular velocity:%s %s%f%s \n",bhyellow,reset,bhwhite,0.2,reset,bhblue,reset,bhwhite,-(1+acc*ang_multiplier),reset);
+                my_vel.linear.x = 0.2;
+                my_vel.angular.z = -(1+acc*ang_multiplier); 
+            }
+            
+            count=5;            
         }
-         
-        // Pubblishing the velocity values
         pub.publish(my_vel);
 
 
@@ -334,27 +326,21 @@ The `std::cin>>` will associate the `char` input to a `char` variable that will 
 
 void Interaction()
 {
-    
-    // Custom message with which will send the updated data to the controller.
+
     second_assignment::Accelerate acc_srv;
-        
-    // Section due to retriving input from the user.
+
     char in;
     std::cout<<"input 'a' to accelerate, 's' to slow down or 'r' to RESET:\n";
     std::cin>>in;
-        
-    // The request is set as the user's input value.
+
     acc_srv.request.input= in;
     client1.waitForExistence();
     client1.call(acc_srv);
     
-    // Declaration of the castom message object.
     second_assignment::Acc my_acc;
     
-    // Assigning the value of the response of the service to the custom message value.
     my_acc.a = acc_srv.response.val;
     
-    // Publishing the value to the correct topic.
     pub.publish(my_acc);
     
 }

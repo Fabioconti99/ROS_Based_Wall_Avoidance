@@ -12,6 +12,12 @@ ros::Publisher pub;
 // Client to the custom service to get the response for updateing the velocity factor.
 ros::ServiceClient client1;
 
+// Colors for konsole prints.
+const char *red = "\033[0;31m";
+const char *green = "\033[1;32m";
+const char *yellow = "\033[1;33m";
+const char *reset = "\033[0m";
+
 // Function needed for the UI_node to always be ready to ask the user for encreasing or decreasing the robot's speed.
 void Interaction()
 {
@@ -21,7 +27,7 @@ void Interaction()
 		
     // Section due to retriving input from the user.
 	char in;
-	ROS_INFO("Input 'a' to accelerate, 's' to slow down or 'r' to RESET:\n");
+	std::printf("Input %s[a]%s to %saccelerate%s | Input %s[s]%s to %sdecelerate%s | Input %s[r]%s to %sRESET%s:\n",green,reset,green,reset,yellow,reset,yellow,reset,red,reset,red,reset);
 	
 	std::cin>>in;
 		
