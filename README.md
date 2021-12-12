@@ -77,9 +77,9 @@ the launch script lets the user start the whole project with just one command. T
 ```xml
 
 <launch>
-  <node name="robot_controller_node" pkg="second_assignment" type="robot_controller_node" required="true"/>
-  <node name="input_node" pkg="second_assignment" type="input_node" output="screen" launch-prefix="terminator -fg white -bg black -e "  required="true"/>
-  <node name="UI_node" pkg="second_assignment" type="UI_node" output="screen" launch-prefix="terminator -fg white -bg black -e "  required="true"/>
+  <node name="robot_controller_node" pkg="second_assignment" type="robot_controller_node" output="screen" required="true"/>
+  <node name="input_node" pkg="second_assignment" type="input_node" output="screen" launch-prefix="xterm -fg white -bg black -e "  required="true"/>
+  <node name="UI_node" pkg="second_assignment" type="UI_node" output="screen" launch-prefix="xterm -fg white -bg black -e "  required="true"/>
   <node name="stageros" pkg="stage_ros" type="stageros" required ="true" args = "$(find second_assignment)/world/my_world.world"/>
 </launch>
 ```
