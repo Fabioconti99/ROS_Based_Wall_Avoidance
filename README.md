@@ -257,7 +257,7 @@ rosrun second_assignment robot_controller_node
 
 <p align="center">
 
-<img height="790" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/flow2.png">
+<img height="770" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/flow2.png">
 
 </p>
 
