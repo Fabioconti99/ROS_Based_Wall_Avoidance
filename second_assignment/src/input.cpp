@@ -40,7 +40,7 @@ bool char_input (second_assignment::Accelerate::Request &req, second_assignment:
 		std::printf("got %sr%s\n",red,reset);
 		
 		ros::service::call("/reset_positions", reset_srv);
-		
+		acc = 0.0;
 	}
 	
     // If any other character is pressed an error message will show up.
