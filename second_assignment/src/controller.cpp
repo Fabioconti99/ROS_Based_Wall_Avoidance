@@ -128,14 +128,14 @@ int main (int argc, char **argv)
 	ros::init(argc, argv, "robot_controller"); 
 	ros::NodeHandle nh;
     
-    // Initialize the two subscribers for both the call backs.
+    	// Initialize the two subscribers for both the call backs.
 	ros::Subscriber sub = nh.subscribe("/base_scan", 1000,robotCallback);
 	ros::Subscriber sub1 = nh.subscribe("/acc", 1000,accelerator);
 	
-    // Initialize the publisher needed to publish the new velocity values to update the robot's speed.
+    	// Initialize the publisher needed to publish the new velocity values to update the robot's speed.
 	pub = nh.advertise<geometry_msgs::Twist> ("/cmd_vel", 1000);
     
-    // Function to loop the callback functions.
+    	// Function to loop the callback functions.
 	ros::spin();
 	
 	return 0;
