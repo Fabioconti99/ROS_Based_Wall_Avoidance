@@ -1,5 +1,7 @@
  #  [Research_Track_1](https://unige.it/en/off.f/2021/ins/51201.html?codcla=10635) , [Robotics Engineering](https://courses.unige.it/10635) ([UNIGE](https://unige.it/it/)) : Second assignement
-## Robot Operating System <img height="30" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/ros.png"> & C++ <img height="30" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/cpl.png">
+## Robot Operating System ![ros](img height="30" src="https://user-images.githubusercontent.com/91262561/146335844-fed54fd7-3ac1-4302-a94f-c5784b58770a.png") & C++ ![cpl](img height="30" src="https://user-images.githubusercontent.com/91262561/146336027-52311e78-98ca-497b-8a3e-9436612e4d57.png")
+
+
 ### Professor. [Carmine Recchiuto](https://github.com/CarmineD8)
 
 
@@ -22,7 +24,7 @@ The user will be able to interact with the simulation through the use of **KeyBo
 
 Picture of the **Enviroment**:
 
-![alt text](https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/map.png) 
+<img width="457" alt="map" src="https://user-images.githubusercontent.com/91262561/146336195-fd7caa60-e7c7-481f-a12a-bfaaac966320.png">
 
 With everything working correctly, the robot should lap around the circuit avoiding the walls at different velocities on an infinite loop. If the velocity
 gets too high, it may lead to the robot crashing into the wall but that would be perfectly reasonable. 
