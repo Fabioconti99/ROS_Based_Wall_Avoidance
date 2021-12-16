@@ -22,7 +22,7 @@ The user will be able to interact with the simulation through the use of **KeyBo
 
 Picture of the **Enviroment**:
 
-<img width="457" alt="map" src="https://user-images.githubusercontent.com/91262561/146336195-fd7caa60-e7c7-481f-a12a-bfaaac966320.png">
+![alt text](https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/map.png) 
 
 With everything working correctly, the robot should lap around the circuit avoiding the walls at different velocities on an infinite loop. If the velocity
 gets too high, it may lead to the robot crashing into the wall but that would be perfectly reasonable. 
