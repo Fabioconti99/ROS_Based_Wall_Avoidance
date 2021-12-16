@@ -40,6 +40,8 @@ bool char_input (second_assignment::Accelerate::Request &req, second_assignment:
 		std::printf("got %sr%s\n",red,reset);
 		
 		ros::service::call("/reset_positions", reset_srv);
+        
+        // Setting the acceleration factor to 0.
 		acc = 0.0;
 	}
 	

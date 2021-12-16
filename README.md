@@ -1,4 +1,4 @@
- #  [Research_Track_1](https://unige.it/en/off.f/2021/ins/51201.html?codcla=10635) , [Robotics Engineering](https://courses.unige.it/10635) ([UNIGE](https://unige.it/it/)) : Second assignement
+#  [Research_Track_1](https://unige.it/en/off.f/2021/ins/51201.html?codcla=10635) , [Robotics Engineering](https://courses.unige.it/10635) ([UNIGE](https://unige.it/it/)) : Second assignement
 ## Robot Operating System <img height="30" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/ros.png"> & C++ <img height="30" src="https://github.com/Fabioconti99/RT1_Assignment_2/blob/main/images/cpl.png">
 ### Professor. [Carmine Recchiuto](https://github.com/CarmineD8)
 
@@ -43,6 +43,10 @@ The package I developed contains:
 
 
 ## Running the simulation
+
+* After downloading the repository, you should take the `second_assignment` directory included in the repo and place it inside the local workspace directory.
+
+* Running the `catkin_make` command form the workspace directory to compile all the scripts in the package.
 
 * Please follow these steps to run the Circuit scene:
 
@@ -270,7 +274,7 @@ The service is advertised inside of the *bool function*  `char_input`. The **req
 
 * Send a **response** to *increase* the acceleration factor by 0.5 units if the `char` value is equal to `a`,
 * Send a **response** to *decrease* the acceleration factor by 0.5 units if the `char` value is equal to `s`,
-* Call the service `/reset_positions (std_srvs/Empty)` to RESET the position of the robot  if the `char` value is equal to `r`,
+* Call the service `/reset_positions (std_srvs/Empty)` to RESET the position of the robot and setting to 0 the robot's acceleration factor if the `char` value is equal to `r`,
 * Give an ERROR message if any other  `char` value is entered.
 
 Once either the  `a` or the  `s` key are pressed, the global variable  `acc` will either increase or decrease by half a unit. This variable will later be assigned to the **response** of the service. 
@@ -280,26 +284,30 @@ Once either the  `a` or the  `s` key are pressed, the global variable  `acc` wil
 ```cpp
 
 bool char_input (second_assignment::Accelerate::Request &req, second_assignment::Accelerate::Response &res)
-{ 
+{
     std_srvs::Empty reset_srv;
-    if (req.input=='a'){
     
-        std::cout<<"got a\n";
+    if (req.input=='a'){
+        std::printf("got %sa%s\n",green,reset);
         acc =acc+0.5;
     }
+    
     if (req.input == 's'){
-        std::cout<<"got s\n";
+        std::printf("got %ss%s\n",yellow,reset);
         acc =acc-0.5;
     }
+    
     if (req.input == 'r'){
-        std::cout<<"got r\n";
+        std::printf("got %sr%s\n",red,reset);
         ros::service::call("/reset_positions", reset_srv);
+        acc = 0.0;
     }
+    
     if (req.input != 's' && req.input != 'r' && req.input != 'a' ){
-        std::cout<<"wrong char\n";
+        std::printf("%swrong input%s\n",red,reset);
     }
+    
     res.val = acc;
-    std::cout<<res.val<<"\n";
     return true; 
 }
 ```
